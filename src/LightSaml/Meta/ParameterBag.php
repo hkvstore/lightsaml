@@ -131,4 +131,14 @@ class ParameterBag implements \IteratorAggregate, \Countable, \Serializable
     {
         $this->parameters = unserialize($serialized);
     }
+
+    public function __serialize(): array
+    {
+        return $this->parameters;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->parameters = $data;
+    }
 }

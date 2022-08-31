@@ -219,4 +219,33 @@ class SsoState implements \Serializable
             $this->parameters->add($oldOptions);
         }
     }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->localSessionId,
+            $this->ssoSessions,
+            [],
+            $this->parameters,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        // add a few extra elements in the array to ensure that we have enough keys when unserializing
+        // older data which does not include all properties.
+        $data = array_merge($data, array_fill(0, 5, null));
+        $oldOptions = null;
+
+        list(
+            $this->localSessionId,
+            $this->ssoSessions,
+            $oldOptions, // old deprecated options
+            $this->parameters) = $data;
+
+        // in case it was serialized in old way, copy old options to parameters
+        if ($oldOptions && 0 == $this->parameters->count()) {
+            $this->parameters->add($oldOptions);
+        }
+    }
 }

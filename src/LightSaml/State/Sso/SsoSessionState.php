@@ -335,4 +335,45 @@ class SsoSessionState implements \Serializable
             $this->parameters->replace($options);
         }
     }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->idpEntityId,
+            $this->spEntityId,
+            $this->nameId,
+            $this->nameIdFormat,
+            $this->sessionIndex,
+            $this->sessionInstant,
+            $this->firstAuthOn,
+            $this->lastAuthOn,
+            [],
+            $this->parameters,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        // add a few extra elements in the array to ensure that we have enough keys when unserializing
+        // older data which does not include all properties.
+        $data = array_merge($data, array_fill(0, 5, null));
+
+        list(
+            $this->idpEntityId,
+            $this->spEntityId,
+            $this->nameId,
+            $this->nameIdFormat,
+            $this->sessionIndex,
+            $this->sessionInstant,
+            $this->firstAuthOn,
+            $this->lastAuthOn,
+            $options,
+            $this->parameters
+        ) = $data;
+
+        // if deserialized from old format, set old options to new parameters
+        if ($options && 0 == $this->parameters->count()) {
+            $this->parameters->replace($options);
+        }
+    }
 }
